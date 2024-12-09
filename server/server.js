@@ -1,17 +1,13 @@
-//ANDROID APP SERVER
-
 import fastify from 'fastify';
 import fastifyPostgres from '@fastify/postgres';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
 const fast = fastify();
-
-
 const secret = process.env.SECRET_KEY; 
+const noAuthRoutes = ['/health','/login'];
 
-
-// Add a global error handler
+// global error handler
 fast.setErrorHandler((error, request, reply) => {
   console.error(error);
   reply.code(500).send({ error: 'Internal Server Error' });
@@ -23,11 +19,12 @@ fast.register(fastifyPostgres, {
 }); 
 
 
+async function authenticate(request, reply) {
 
-
-
-
-const authenticate = async (request, reply) => {
+  if (noAuthRoutes.includes(request.url)) {
+    return; // Skip authentication for noAuthRoutes
+  }
+  
   try {
     const token = request.headers.authorization;
     jwt.verify(token, secret, (error, decoded) => {
@@ -43,7 +40,7 @@ const authenticate = async (request, reply) => {
 
 fast.addHook('preHandler', authenticate);
 
-async function processVote(userId, movieId, directorId) {
+async function processVote(userId, movieId, directorId){
   try {
     const client = await fast.pg.connect();
     const result = await client.query('INSERT INTO votos (usuario_id, filme_id, diretor_id) VALUES ($1, $2, $3)', [userId, movieId, directorId]);
@@ -68,7 +65,9 @@ fast.get('/health', async (request, reply) => {
   reply.send({ status: 'OK' });
 });
 
-fast.post('/login', async (request, reply) => {
+
+
+fast.post('/login', async (request, reply) =>{
   try {
     const { username, password } = request.body;
 
@@ -103,20 +102,10 @@ fast.post('/login', async (request, reply) => {
 
 fast.post('/vote', async (request, reply) => {
   try {
-    const token = request.headers.authorization;
-
-    // Verify the JWT token
-
-    jwt.verify(token, secret, (error, decoded) => {
-      if (error) {
-        throw new Error('Invalid token');
-      }
-
       const userId = decoded.userId;
       const movieId = request.body.movieId;
       const directorId = request.body.directorId;
 
-      // Process the vote
       processVote(userId, movieId, directorId)
         .then(() => {
           reply.send({ message: 'Vote successfully cast' });
@@ -125,12 +114,13 @@ fast.post('/vote', async (request, reply) => {
           console.error(error);
           reply.code(500).send({ error: 'Failed to cast vote' });
         });
-    });
+    
   } catch (error) {
     console.error(error);
     reply.code(500).send({ error: 'Internal Server Error' });
   }
 });
+
 
 
 fast.get('/filmes', async (request, reply) => {
@@ -144,6 +134,8 @@ fast.get('/filmes', async (request, reply) => {
     await client.release();
   }
 });
+
+
 
 fast.get('/diretores', async (request, reply) => {
   const client = await fast.pg.connect(); // Use fast.pg to connect

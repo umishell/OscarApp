@@ -67,18 +67,19 @@ fast.get('/health', async (request, reply) => {
 
 
 
-fast.post('/login', async (request, reply) =>{
+fast.post('/login', async (request, reply) => {
+
+
   try {
     const { username, password } = request.body;
 
     // Verify the user's credentials
     const client = await fast.pg.connect();
-    const { rows } = await client.query('SELECT * FROM usuarios WHERE username = $1', [username]);
+    const { rows } = await client.query('SELECT * FROM oscar.usuarios WHERE username = $1', [username]);
 
     if (!rows || rows.length === 0) {
       throw new Error('Invalid username or password');
     }
-
     const user = rows[0];
 
     if (!user || user.password !== password) {
@@ -88,7 +89,13 @@ fast.post('/login', async (request, reply) =>{
     // Generate a JWT token
     const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '1h' });
 
-    reply.send({ token });
+reply.send(token);
+
+    // Save the token to the tokens table
+    const result = await client.query('INSERT INTO oscar.tokens (token, usuario_id) VALUES ($1, $2) RETURNING issued_at', [token, user.id]);
+    const issuedAt = result.rows[0].issued_at;
+    reply.send({ token, issuedAt });
+
   } catch (error) {
     console.error(error);
     reply.code(500).send({ error: 'Internal Server Error' });
@@ -127,7 +134,7 @@ fast.get('/filmes', async (request, reply) => {
   const client = await fast.pg.connect(); // Use fast.pg to connect
 
   try {
-    const { rows } = await client.query('SELECT * FROM filmes');
+    const { rows } = await client.query('SELECT * FROM oscar.filmes');
     reply.send(rows);
 
   } finally {
@@ -141,7 +148,7 @@ fast.get('/diretores', async (request, reply) => {
   const client = await fast.pg.connect(); // Use fast.pg to connect
 
   try {
-    const { rows } = await client.query('SELECT * FROM diretores');
+    const { rows } = await client.query('SELECT * FROM oscar.diretores');
     reply.send(rows);
 
   } finally {

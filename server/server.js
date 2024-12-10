@@ -52,26 +52,26 @@ fast.get('/health', async (request, reply) => {
 
 fast.post('/login', async (request, reply) => {
   try {
-    const { username, password } = request.body;
+    const { username, password } = request.body; 
     const { rows } = await fast.pg.query('SELECT * FROM oscar.usuarios WHERE username = $1', [username]);
-
+reply.send(rows);
     if (!rows || rows.length === 0) {
       throw new Error('Invalid username or password');
     }
     const user = rows[0];
-    const id = user.id;
 
     if (!user || user.password !== password) {
       throw new Error('Invalid username or password');
     }
 
     // Generate TOKEN
-    const token = jwt.sign({ userId: user.id }, "secret", { expiresIn: '1h' });
+    //const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '1h' });
+    const token1 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
 
     const result = await fast.pg.query('INSERT INTO oscar.tokens (token, usuario_id) VALUES ($1, $2) RETURNING issued_at', [token, user.id]);
     const issuedAt = result.rows[0].issued_at;
 
-    reply.send({ id, token, issuedAt });
+    reply.send({ id, token1, issuedAt });
 
   } catch (error) {
     console.error(error);
@@ -112,11 +112,11 @@ async function authenticate(request, reply) {
   try {
 
     const token = request.headers.authorization;
-    
+    const token1 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
     const token2 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
     
     
-    const decoded = await jwt.verify(token, "secret");
+    const decoded = await jwt.verify(token, secret);
     reply.send(decoded);
     
     // Check if the token has expired

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".controller.Menu">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        tools:layout_editor_absoluteX="164dp"
+        tools:layout_editor_absoluteY="173dp" />
+
+    <Button
+        android:id="@+id/btnFilmes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filmes"
+        tools:layout_editor_absoluteX="146dp"
+        tools:layout_editor_absoluteY="266dp" />
+
+    <Button
+        android:id="@+id/btnDiretores"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Diretores"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499"
+        tools:layout_editor_absoluteX="146dp" />
+
+    <Button
+        android:id="@+id/btnFinalizarVoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Finalizar Voto"
+        tools:layout_editor_absoluteX="127dp"
+        tools:layout_editor_absoluteY="418dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

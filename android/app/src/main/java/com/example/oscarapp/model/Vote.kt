@@ -1,6 +1,8 @@
 package com.example.oscarapp.model
 
-data class Vote(val userId: Int, val movieId: Int, val directorId: Int) {
+import com.google.gson.Gson
+
+data class Vote(val userId: Int, val movieId: Int, val directorId: Int, val token: String) {
 
     fun toJsonString(): String {
         val gson = Gson()

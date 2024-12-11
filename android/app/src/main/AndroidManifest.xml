@@ -13,7 +13,16 @@
         android:theme="@style/Theme.OscarApp"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".controller.Movie"
+            android:exported="false" />
+        <activity
+            android:name=".controller.Director"
+            android:exported="false" />
+        <activity
+            android:name=".controller.Menu"
+            android:exported="false" />
+        <activity
+            android:name=".controller.Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

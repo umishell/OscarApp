@@ -17,5 +17,19 @@ class Menu : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        fun goMovies(view: View) {
+            val intent = Intent(this, Movie::class.java)
+            startActivity(intent)
+        }
+        fun goDirectors(view: View) {
+            val intent = Intent(this, Menu::class.java)
+            startActivity(intent)
+        }
+        fun goLogin(view: View) {
+            val intent = Intent(this, Menu::class.java)
+            startActivity(intent)
+        }
+
     }
 }

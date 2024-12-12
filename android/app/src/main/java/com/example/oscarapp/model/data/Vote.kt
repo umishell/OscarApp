@@ -1,8 +1,12 @@
-package com.example.oscarapp.model
+package com.example.oscarapp.model.data
 
+import android.os.Parcelable
 import com.google.gson.Gson
+import kotlinx.parcelize.Parcelize
 
-data class Vote(val userId: Int, val movieId: Int, val directorId: Int, val token: String) {
+@Parcelize
+data class Vote(val userId: Int, val token: String, val movieId: Int, val directorId: Int):
+    Parcelable {
 
     fun toJsonString(): String {
         val gson = Gson()

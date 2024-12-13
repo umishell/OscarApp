@@ -7,17 +7,6 @@ const fast = fastify();
 const secret = process.env.SECRET_KEY; 
 const noAuthRoutes = ['/health','/login','/filmes','/diretores'];
 
-const processVote = async (userId, movieId, directorId) => {
-  try {
-    const result = await fast.pg.query('INSERT INTO oscar.votos (usuario_id, filme_id, diretor_id) VALUES ($1, $2, $3)', [userId, movieId, directorId]);
-    if (result.rowCount === 0) {
-      throw new Error('Failed to cast vote');
-    }
-    return true;
-  } catch (error) {
-    throw error;
-  }
-}
 
 fast.register(fp, {
   connectionString: process.env.DATABASE_URL,
@@ -42,10 +31,6 @@ async function processVote(userId, movieId, directorId){
     if (result.rowCount === 0) {
       throw new Error('Failed to cast vote');
     }
-
-    // Additional logic to handle the vote, such as updating the vote count
-    // ...
-
     return true;
   } catch (error) {
     throw error;
@@ -65,25 +50,24 @@ fast.post('/login', async (request, reply) => {
   try {
     const { username, password } = request.body; 
     const { rows } = await fast.pg.query('SELECT * FROM oscar.usuarios WHERE username = $1', [username]);
-reply.send(rows);
+
     if (!rows || rows.length === 0) {
       throw new Error('Invalid username or password');
     }
     const user = rows[0];
-
     if (!user || user.password !== password) {
       throw new Error('Invalid username or password');
     }
 
     // Generate TOKEN
-    //const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '1h' });
-    const token = jwt.sign({ userId: 333333 }, secret, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '12h' });
+    //const token = jwt.sign({ userId: 333333 }, secret, { expiresIn: '1h' });
 
     const result = await fast.pg.query('INSERT INTO oscar.tokens (token, usuario_id) VALUES ($1, $2) RETURNING issued_at', [token, user.id]);
     const issuedAt = result.rows[0].issued_at;
-
+    const id = user.id;
     reply.send({ id, token, issuedAt });
-
+    
   } catch (error) {
     console.error(error);
     reply.code(500).send({ error: 'Problem logging in' });
@@ -123,10 +107,10 @@ async function authenticate(request, reply) {
   try {
 
     const token = request.headers.authorization;
-    //const token1 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
+    const token1 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
     //const token2 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
     
-    
+reply.send(token);
     const decoded = await jwt.verify(token, secret);
     reply.send(decoded);
     
@@ -150,7 +134,7 @@ fast.post('/vote', async (request, reply) => {
       const token = request.body.token;
       const movieId = request.body.movieId;
       const directorId = request.body.directorId;
-//reply.send(userId, token, movieId, directorId);
+reply.send(userId, token, movieId, directorId);
       processVote(userId, movieId, directorId)
         .then(() => {
           reply.send({ message: 'Vote successfully cast' });

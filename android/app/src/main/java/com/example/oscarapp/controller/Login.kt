@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 
 class Login : AppCompatActivity() {
+
+    lateinit var username: String
+    lateinit var password: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -34,9 +39,14 @@ class Login : AppCompatActivity() {
             insets
         }
 
+        val editxtUsername = findViewById<EditText>(R.id.editxtUsername)
+        val editxtPassword = findViewById<EditText>(R.id.editxtPassword)
+
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         btnLogin.setOnClickListener {
-            loginUser("yourUsername", "yourPassword") { response, error ->
+            username = editxtUsername.text.toString()
+            password = editxtPassword.text.toString()
+            loginUser(username, password) { response, error ->
                 if (error != null) {
                     // Handle error
                     runOnUiThread {
@@ -44,10 +54,11 @@ class Login : AppCompatActivity() {
                     }
                 } else if (response != null) {
                     // Handle successful response
-                    val token = response.getString("token1") // Extract token
-//val issuedAt = response.getString("issuedAt") // Extract issued_at
+                    val userId = response.getInt("userId") // Extract userId
+                    val token = response.getString("token") // Extract token
+                    val issuedAt = response.getString("issuedAt") // Extract issued_at
                     runOnUiThread {
-                        Toast.makeText(this, "Login successful. Token: $token", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Login successful. User ID: $userId, Token: $token, Issued At: $issuedAt", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -68,7 +79,7 @@ class Login : AppCompatActivity() {
         val client = OkHttpClient()
 
         // URL to your Fastify login endpoint
-        val url = "http://your-server-url/login"
+        val url = "http://localhost:3000/login"
 
         // Create the JSON body for the POST request
         val jsonBody = JSONObject()

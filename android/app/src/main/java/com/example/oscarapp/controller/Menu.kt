@@ -1,6 +1,8 @@
 package com.example.oscarapp.controller
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -19,15 +21,15 @@ class Menu : AppCompatActivity() {
         }
 
         fun goMovies(view: View) {
-            val intent = Intent(this, Movie::class.java)
+            val intent = Intent(this, Movies::class.java)
             startActivity(intent)
         }
         fun goDirectors(view: View) {
-            val intent = Intent(this, Menu::class.java)
+            val intent = Intent(this, Directors::class.java)
             startActivity(intent)
         }
         fun goLogin(view: View) {
-            val intent = Intent(this, Menu::class.java)
+            val intent = Intent(this, Login::class.java)
             startActivity(intent)
         }
 

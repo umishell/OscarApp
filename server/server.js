@@ -66,12 +66,12 @@ reply.send(rows);
 
     // Generate TOKEN
     //const token = jwt.sign({ userId: user.id }, secret, { expiresIn: '1h' });
-    const token1 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: 333333 }, secret, { expiresIn: '1h' });
 
     const result = await fast.pg.query('INSERT INTO oscar.tokens (token, usuario_id) VALUES ($1, $2) RETURNING issued_at', [token, user.id]);
     const issuedAt = result.rows[0].issued_at;
 
-    reply.send({ id, token1, issuedAt });
+    reply.send({ id, token, issuedAt });
 
   } catch (error) {
     console.error(error);

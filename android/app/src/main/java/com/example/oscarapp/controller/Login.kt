@@ -53,9 +53,9 @@ class Login : AppCompatActivity() {
             }
 
         }
-        }
-
     }
+
+
 
     fun goMenu(view: View) {
         val intent = Intent(this, Menu::class.java)

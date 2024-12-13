@@ -7,6 +7,17 @@ const fast = fastify();
 const secret = process.env.SECRET_KEY; 
 const noAuthRoutes = ['/health','/login','/filmes','/diretores'];
 
+const processVote = async (userId, movieId, directorId) => {
+  try {
+    const result = await fast.pg.query('INSERT INTO oscar.votos (usuario_id, filme_id, diretor_id) VALUES ($1, $2, $3)', [userId, movieId, directorId]);
+    if (result.rowCount === 0) {
+      throw new Error('Failed to cast vote');
+    }
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}
 
 fast.register(fp, {
   connectionString: process.env.DATABASE_URL,
@@ -112,8 +123,8 @@ async function authenticate(request, reply) {
   try {
 
     const token = request.headers.authorization;
-    const token1 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
-    const token2 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
+    //const token1 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
+    //const token2 = jwt.sign({ userId: 1 }, secret, { expiresIn: '1h' });
     
     
     const decoded = await jwt.verify(token, secret);
@@ -136,9 +147,10 @@ fast.addHook('preHandler', authenticate);
 fast.post('/vote', async (request, reply) => {
   try {
       const userId = request.body.userId;
+      const token = request.body.token;
       const movieId = request.body.movieId;
       const directorId = request.body.directorId;
-reply.send(userId, movieId, directorId);
+//reply.send(userId, token, movieId, directorId);
       processVote(userId, movieId, directorId)
         .then(() => {
           reply.send({ message: 'Vote successfully cast' });
@@ -167,3 +179,5 @@ fast.listen({ port: 3000 }, (err, address) => {
   }
   fast.log.info(`server listening on ${address}`);
 });
+
+

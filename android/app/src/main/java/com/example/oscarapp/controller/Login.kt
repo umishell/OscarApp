@@ -78,7 +78,7 @@ class Login : AppCompatActivity() {
     fun loginUser(username: String, password: String, callback: (JSONObject?, String?) -> Unit) {
         val client = OkHttpClient()
 
-        // URL to your Fastify login endpoint
+
         val url = "http://localhost:3000/login"
 
         // Create the JSON body for the POST request

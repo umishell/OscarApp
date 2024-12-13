@@ -2,6 +2,8 @@ import fastify from 'fastify';
 import fp from '@fastify/postgres';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import fastifyHttps from 'fastify-https';
+
 
 const fast = fastify();
 const secret = process.env.SECRET_KEY; 
@@ -12,6 +14,11 @@ fast.register(fp, {
   connectionString: process.env.DATABASE_URL,
 });
 
+fastify.register(fastifyHttps, {
+  allowUntrusted: process.env.NODE_ENV === 'development', // Allow for development only
+  certPath: 'path/to/your/server.crt',
+  keyPath: 'path/to/your/server.key'
+});
 
 // global error handler
 fast.setErrorHandler((error, request, reply) => {
